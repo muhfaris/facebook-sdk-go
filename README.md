@@ -1,1 +1,1 @@
-# facebook-go-sdk
+# facebook-sdk-go

@@ -71,8 +71,12 @@ func (session *App) prepareParams(params Params) string {
 		tempQuery.Add(i, j.(string))
 	}
 
-	tempQuery.Add(TextSecretProof, session.AppSecretProofKey)
+	if isEmptyString(session.AppSecretProofKey) {
+		tempQuery.Add(TextSecretProof, session.AppSecretProofKey)
+	}
+
 	tempQuery.Add(TextDebug, session.Debug)
+
 	return tempQuery.Encode()
 }
 

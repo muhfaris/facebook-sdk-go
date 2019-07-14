@@ -4,20 +4,24 @@ type Method string
 type DebugMode string
 type Body interface{}
 type Params map[string]interface{}
-type Result map[string]interface{}
+type Response map[string]interface{}
 
 const (
-	DefaultVersion    = "v3.2"
-	DefaultURL        = "https://graph.facebook.com"
-	DefaultProduction = false
+	APIFacebook string = "https://graph.facebook.com"
 
-	TextBearer      = "Bearer"
-	TextSecretProof = "appsecret_proof"
-	TextDebug       = "debug"
+	DefaultVersion         string = "v3.3"
+	DefaultauthURL         string = "https://www.facebook.com/dialog/oauth"
+	DefaulttokenURL        string = "https://graph.facebook.com/oauth/access_token"
+	DefaultendpointProfile string = "https://graph.facebook.com/me?fields="
+	DefaultProduction      bool   = false
 
-	ErrorCantRequestFacebook = "Can not reach server facebook:"
-	ErrorCantCreateCampaign  = "Can not create campaign:"
-	ErrorCantReadCampaign    = "Can not read campaign:"
+	labelBearer      string = "Bearer"
+	labelSecretProof string = "appsecret_proof"
+	labelDebug       string = "debug"
+
+	ErrorCantRequestFacebook string = "Can not reach server facebook:"
+	ErrorCantCreateCampaign  string = "Can not create campaign:"
+	ErrorCantReadCampaign    string = "Can not read campaign:"
 
 	GET    Method = "GET"
 	POST   Method = "POST"
@@ -35,4 +39,8 @@ const (
 
 var (
 	facebookSuccessJSONBytes = []byte("true")
+
+	defaultScopes = map[string]struct{}{
+		"email": {},
+	}
 )

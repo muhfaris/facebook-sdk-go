@@ -1,29 +1,40 @@
 package facebook
 
+import (
+	"encoding/json"
+	"errors"
+)
+
 type (
-	ErrorResponse struct {
-		Data struct {
-			Code      int    `json:"code"`
-			FbtraceID string `json:"fbtrace_id"`
-			Message   string `json:"message"`
-			Type      string `json:"type"`
-			Error     error
-		} `json:"error"`
+	Error struct {
+		Message      string
+		Type         string
+		Code         int
+		ErrorSubcode int    // subcode for authentication related errors.
+		UserTitle    string `json:"error_user_title"`
+		UserMessage  string `json:"error_user_msg"`
+		IsTransient  bool   `json:"is_transient"`
+		TraceID      string `json:"fbtrace_id"`
 	}
 )
 
-func (e *ErrorResponse) Message() string {
-	return e.Data.Message
+func (e *Error) Msg() string {
+	return e.Message
 }
 
-func (e *ErrorResponse) Errors() error {
-	return e.Data.Error
+func (e *Error) Error() error {
+	return errors.New(e.Message)
 }
 
-func NewError(err error, msg string, status int) *ErrorResponse {
-	return &ErrorResponse{}
+func (e *Error) isError() bool {
+	return (e.TraceID != "")
 }
 
-func NewErrorWrapf(err error, prefix, suffix, msg string, status int) *ErrorResponse {
-	return &ErrorResponse{}
+func newError(response []byte) *Error {
+	var error Error
+	if err := json.Unmarshal(response, &error); err != nil {
+		return &error
+	}
+
+	return &error
 }

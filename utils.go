@@ -4,8 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
-	"net/http"
 )
 
 func GenerateSecretProof(token, secret string) string {
@@ -19,19 +17,9 @@ func GenerateSecretProof(token, secret string) string {
 }
 
 func isEmptyString(param string) bool {
-	if len(param) < 1 {
+	if param != "" {
 		return false
 	}
+
 	return true
-}
-
-func isErrorResponse(jsonBytes []byte, resp *http.Response) (ErrorResponse, bool) {
-	var tempResult ErrorResponse
-	json.Unmarshal(jsonBytes, &tempResult)
-
-	if (tempResult == ErrorResponse{}) {
-		return ErrorResponse{}, false
-	}
-
-	return tempResult, true
 }

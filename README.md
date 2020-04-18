@@ -8,82 +8,47 @@ to the Graph API.
 - Locally trusted development tool (e.g mkcert)
 
 ## Usage
+### Get Ad accounts (Graph API)
 ```
-package main
+    import github.com/muhfaris/facebook-sdk-go"
+    appID := "xxx"
+	appSecret:= "yyyy"
+	token := "token"
 
-import (
-	"encoding/json"
-	"log"
-	"net/http"
+	fbSDK := facebook.InitRequest("test main", appID, appSecret, "v5.0", token)
+	resp := fbSDK.Request(facebook.GraphAPI, "/me/adaccounts", http.MethodGet, nil)
 
-	"github.com/gorilla/mux"
-	"github.com/muhfaris/facebook-sdk-go"
-)
-
-var (
-	fbApp *facebook.App
-)
-
-func main() {
-	fbApp = facebook.Init(
-		"",
-		"<application id>",
-		"<application key>",
-		"<callback url>",
-		"<scopes>")
-
-	r := mux.NewRouter()
-	r.HandleFunc("/facebook", handlerFacebook).Methods(http.MethodGet)
-	r.HandleFunc("/callback", handlerCallback).Methods(http.MethodGet)
-
-	log.Println(http.ListenAndServe(":7070", r))
-}
-
-func handlerFacebook(w http.ResponseWriter, r *http.Request) {
-	url := fbApp.GetAuthURL()
-	http.Redirect(w, r, url, http.StatusFound)
-	return
-}
-
-func handlerCallback(w http.ResponseWriter, r *http.Request) {
-	code := r.FormValue("code")
-
-	token, err := fbApp.GetToken(code)
-	if err != nil {
-		w.Write([]byte("Invalid to get token facebook"))
+	if resp.Error != nil {
+		log.Println(resp.Error)
 		return
 	}
 
-	fbApp.SetToken(token.AccessToken)
-	data, err := fbApp.GET(
-		"me",
-		facebook.Params{
-			"fields": "first_name, middle_name, last_name, name, email, short_name",
-		},
-	)
+	log.Println("Response:", string(resp.Result.([]byte)))
+```
 
-	response, err := json.Marshal(data)
-	if err != nil {
-		w.Write([]byte("Error can not parse response facebook"))
+### Get campaigns (Marketing API)
+```
+    import github.com/muhfaris/facebook-sdk-go"
+
+    appID := "xxx"
+	appSecret:= "yyy"
+	token := "token"
+
+	fbSDK := facebook.InitRequest("test main", appID, appSecret, "v5.0", token)
+	resp := fbSDK.Request(
+		facebook.GraphAPI,
+		"/act_11111/campaigns",
+		http.MethodGet,
+		nil)
+
+	if resp.Error != nil {
+		log.Println(resp.Error)
 		return
 	}
 
-	w.Write(response)
-	return
-}
+	log.Println("Response:", string(resp.Result.([]byte)))
 ```
 
-
-Response :
-```
-{
-    email: "akunsosmedx02@gmail.com",
-    first_name: "Muhammad",
-    last_name: "Faris",
-    name: "Muhammad Faris",
-    short_name: "Muhammad"
-}
-```
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 

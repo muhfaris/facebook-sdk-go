@@ -21,6 +21,7 @@ type App struct {
 	version     string
 }
 
+// Init is initialize init function
 func Init(name, appID, appKey, callbackURL, version string, scopes ...string) *App {
 	a := &App{
 		name:        name,
@@ -31,6 +32,19 @@ func Init(name, appID, appKey, callbackURL, version string, scopes ...string) *A
 	}
 
 	a.config = newConfig(a, scopes)
+	return a
+}
+
+// InitRequest if use without auth facebook
+func InitRequest(name, appID, appKey, version, token string) *App {
+	a := &App{
+		name:    name,
+		appID:   appID,
+		appKey:  appKey,
+		version: version,
+		token:   token,
+	}
+
 	return a
 }
 
@@ -77,10 +91,10 @@ func (app *App) SetToken(token string) {
 }
 
 func (app *App) getURIFacebook() string {
-	var version = DefaultVersion
+	var version = DefaultVersionAPI
 	if app.version != "" {
 		version = app.version
 	}
 
-	return fmt.Sprintf("%s/%s", APIFacebook, version)
+	return fmt.Sprintf("%s/%s", FacebookAPI, version)
 }

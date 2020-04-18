@@ -1,16 +1,30 @@
 package facebook
 
+// Method is string type custom
 type Method string
+
+// DebugMode is string type custom
 type DebugMode string
+
+// Body is interface
 type Body interface{}
+
+// Params is map string interface
 type Params map[string]interface{}
+
+// Response is map string interface
 type Response map[string]interface{}
 
 const (
-	APIFacebook string = "https://graph.facebook.com"
+	// FacebookAPI is endpoint
+	FacebookAPI string = "https://graph.facebook.com"
 
-	DefaultVersion         string = "v3.3"
-	DefaultauthURL         string = "https://www.facebook.com/dialog/oauth"
+	// DefaultVersionAPI is default version api
+	DefaultVersionAPI string = "v3.3"
+
+	// DefaultauthURL is auth url facebook
+	DefaultauthURL string = "https://www.facebook.com/dialog/oauth"
+
 	DefaulttokenURL        string = "https://graph.facebook.com/oauth/access_token"
 	DefaultendpointProfile string = "https://graph.facebook.com/me?fields="
 	DefaultProduction      bool   = false
@@ -29,12 +43,8 @@ const (
 	PATCH  Method = "PATCH"
 	DELETE Method = "DELETE"
 
-	DEBUG_OFF     DebugMode = "" // turn off debug.
-	DEBUG_ALL     DebugMode = "all"
-	DEBUG_INFO    DebugMode = "info"
-	DEBUG_WARNING DebugMode = "warning"
-
-	HTTPSUCCESSCODE = 200
+	MarketingAPI = "marketingAPI"
+	GraphAPI     = "graphAPI"
 )
 
 var (
@@ -42,5 +52,11 @@ var (
 
 	defaultScopes = map[string]struct{}{
 		"email": {},
+	}
+
+	// APITypes is type of API
+	APITypes = []string{
+		"marketingAPI",
+		"graphAPI",
 	}
 )

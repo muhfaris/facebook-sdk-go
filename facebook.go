@@ -7,10 +7,41 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Config is wrap config app
+type Config struct {
+	APPID   string
+	APPKey  string
+	Token   string
+	Version string
+
+	api    string
+	method string
+}
+
+// BearerToken is format token with bearer
+func (config *Config) generateAPI(path string) {
+	config.api = fmt.Sprintf("%s/%s/%s", FacebookAPI, config.Version, path)
+}
+
+// setMethod is format token with bearer
+func (config *Config) setMethod(method string) {
+	config.method = method
+}
+
+// setToken is set token with bearer
+func (config *Config) setToken() {
+	config.Token = config.BearerToken()
+}
+
+// BearerToken is format token with bearer
+func (config *Config) BearerToken() string {
+	return fmt.Sprintf("Bearer %s", config.Token)
+}
+
 type App struct {
 	name        string
-	appID       string
-	appKey      string
+	AppID       string
+	AppKey      string
 	authURL     string
 	tokenURL    string
 	callbackURL string
@@ -25,8 +56,8 @@ type App struct {
 func Init(name, appID, appKey, callbackURL, version string, scopes ...string) *App {
 	a := &App{
 		name:        name,
-		appID:       appID,
-		appKey:      appKey,
+		AppID:       appID,
+		AppKey:      appKey,
 		callbackURL: callbackURL,
 		version:     version,
 	}
@@ -39,8 +70,8 @@ func Init(name, appID, appKey, callbackURL, version string, scopes ...string) *A
 func InitRequest(name, appID, appKey, version, token string) *App {
 	a := &App{
 		name:    name,
-		appID:   appID,
-		appKey:  appKey,
+		AppID:   appID,
+		AppKey:  appKey,
 		version: version,
 		token:   token,
 	}
@@ -50,8 +81,8 @@ func InitRequest(name, appID, appKey, version, token string) *App {
 
 func newConfig(app *App, scopes []string) *oauth2.Config {
 	c := &oauth2.Config{
-		ClientID:     app.appID,
-		ClientSecret: app.appKey,
+		ClientID:     app.AppID,
+		ClientSecret: app.AppKey,
 		RedirectURL:  app.callbackURL,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  DefaultauthURL,

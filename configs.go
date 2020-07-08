@@ -22,6 +22,12 @@ const (
 	// DefaultVersionAPI is default version api
 	DefaultVersionAPI string = "v3.3"
 
+	// VersionV5 is version 5
+	VersionV5 string = "v5.0"
+
+	// VersionV7 is version 5
+	VersionV7 string = "v7.0"
+
 	// DefaultauthURL is auth url facebook
 	DefaultauthURL string = "https://www.facebook.com/dialog/oauth"
 

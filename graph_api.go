@@ -93,7 +93,8 @@ func (m *Graph) Post(path string, paramQuery ParamQuery, body []byte) Response {
 
 // GetChain is request to facebook with multiple request
 // example request insight from ad account, actually this chain request.
-// because combine Query between insight and ad account or other scope.
+// because that combine Query between insight and ad account or other scope query.
+// e.g act_id?fields=name, insights.fields(reach)
 func (m *Graph) GetChain(path string, paramQuery ParamQuery) Response {
 	url := m.generateURL(path, paramQuery)
 	req := &request.ReqApp{
@@ -110,6 +111,7 @@ func (m *Graph) GetChain(path string, paramQuery ParamQuery) Response {
 	}
 
 	var resp = Response{
+		isChain:      true,
 		HTTPResponse: response.HTTP,
 		Data:         response.Body,
 	}

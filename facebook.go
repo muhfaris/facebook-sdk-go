@@ -14,6 +14,7 @@ type FacebookAPI interface {
 	ChangeToken(string) error
 
 	Get(string, ParamQuery) Response
+	GetChain(string, ParamQuery) Response
 	Post(string, ParamQuery, []byte) Response
 	Batch(ArrayOfBatchBodyRequest) BatchResponse
 }

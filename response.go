@@ -27,7 +27,21 @@ type Response struct {
 
 // Marshal is parse marshal data
 func (r *Response) Marshal() ([]byte, error) {
+	if r.isChain {
+		return r.toByte()
+	}
+
 	return json.Marshal(r.Data)
+}
+
+// ToByte is convert data to byte
+func (r *Response) toByte() ([]byte, error) {
+	data, ok := r.Data.([]byte)
+	if !ok {
+		return nil, errors.New("fbSDK: error cast data to byte")
+	}
+
+	return data, nil
 }
 
 // HasNext is check the data have next pagination

@@ -12,8 +12,9 @@ import (
 func campaigns(c echo.Context) error {
 	config := sdk.Facebook{
 		Token:   "",
-		AppKey:  "30ba840a7c23cf8baea15669a09002c9",
+		AppKey:  "",
 		Version: "v9.0",
+		Graph:   1,
 	}
 
 	fbSDK, err := sdk.NewFacebook(config)
@@ -23,7 +24,7 @@ func campaigns(c echo.Context) error {
 
 	act := c.Param("act")
 	url := fmt.Sprintf("%s/campaigns", act)
-	resp := fbSDK.Get(url, sdk.ParamQuery{})
+	resp := fbSDK.Get(url)
 	if resp.Error != nil {
 		return c.JSON(http.StatusBadRequest, resp)
 	}
@@ -34,8 +35,9 @@ func campaigns(c echo.Context) error {
 func insights(c echo.Context) error {
 	config := sdk.Facebook{
 		Token:   "",
-		AppKey:  "30ba840a7c23cf8baea15669a09002c9",
+		AppKey:  "",
 		Version: "v9.0",
+		Graph:   1,
 	}
 
 	fbSDK, err := sdk.NewFacebook(config)
@@ -45,9 +47,9 @@ func insights(c echo.Context) error {
 
 	id := c.Param("id")
 	url := fmt.Sprintf("%s/insights", id)
-	resp := fbSDK.Get(url, sdk.ParamQuery{
+	resp := fbSDK.Get(url, sdk.WithParamQuery(sdk.ParamQuery{
 		"fields": "reach",
-	})
+	}))
 	if resp.Error != nil {
 		return c.JSON(http.StatusBadRequest, resp)
 	}

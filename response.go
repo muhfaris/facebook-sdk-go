@@ -25,6 +25,21 @@ type Response struct {
 	isChain      bool               `json:"-"`
 }
 
+const (
+	nodeGraph = iota
+	edgeGraph
+)
+
+// Unmarshal is unmarshal data to obejct
+func (r *Response) Unmarshal(v interface{}) error {
+	data, err := r.Marshal()
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(data, v)
+}
+
 // Marshal is parse marshal data
 func (r *Response) Marshal() ([]byte, error) {
 	if r.isChain {

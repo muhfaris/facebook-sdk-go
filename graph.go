@@ -15,6 +15,7 @@ type Graph struct {
 	redirectURL string
 	token       string
 	secretProof string
+	graphType   int // node, edge
 }
 
 // NewGraph is create new graph object
@@ -72,6 +73,13 @@ func GWithRedirectURL(url string) GraphOptions {
 func GWithToken(token string) GraphOptions {
 	return func(g *Graph) {
 		g.token = fmt.Sprintf("%s %s", bearerKey, token)
+	}
+}
+
+// GWithGraph is parameter token
+func GWithGraph(graph int) GraphOptions {
+	return func(g *Graph) {
+		g.graphType = graph
 	}
 }
 

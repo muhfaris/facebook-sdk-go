@@ -13,9 +13,10 @@ type FacebookAPI interface {
 	Authenticate(state string, scopes ...string) *Authenticate
 	ChangeToken(string) error
 
-	Get(string, ParamQuery) Response
-	GetChain(string, ParamQuery) Response
-	Post(string, ParamQuery, []byte) Response
+	Get(string, ...requestOptions) Response
+	Post(string, ...requestOptions) Response
+	Delete(string, ...requestOptions) Response
+
 	Batch(ArrayOfBatchBodyRequest) BatchResponse
 }
 
@@ -27,6 +28,7 @@ type Facebook struct {
 	Version     string
 	Token       string
 	RedirectURL string
+	Graph       int
 }
 
 // NewFacebook is create new object facebook
@@ -37,6 +39,7 @@ func NewFacebook(fb Facebook) (FacebookAPI, error) {
 		GWithAppKey(fb.AppKey),
 		GWithToken(fb.Token),
 		GWithRedirectURL(fb.RedirectURL),
+		GWithGraph(fb.Graph),
 		gSecretProof(fb.AppKey, fb.Token),
 	), nil
 }

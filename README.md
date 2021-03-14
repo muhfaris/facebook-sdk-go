@@ -1,10 +1,12 @@
-## Facebook SDK GO
-The Facebook SDK GO is a library with powerful feature that enable Go developer to easily integrate Facebook login and make requests to the Graph API.
+
+## Facebook SDK Go
+The Facebook SDK Go is a library with powerful feature that enable Go developer to easily integrate Facebook login and make requests to the Graph API.
 
 ## Feature
-- Login Authentication
+- Authentication
 - Graph API
 - Marketing API
+- Batch Request
 
 ## Installation
 ### Special for Login Authentication
@@ -14,6 +16,76 @@ The Facebook SDK GO is a library with powerful feature that enable Go developer 
 
 ## Usage
 ---
+### Overview
+The Graph API is named after the idea of a "social graph" — a representation of the information on Facebook. It's composed of:
+ - nodes — basically individual objects, such as a User, a Photo, a Page, or a Comment
+ - edges — connections between a collection of objects and a single object, such as Photos on a Page or Comments on a Photo
+
+#### Nodes
+Reading operations almost always begin with a node. A node is an individual object with a unique ID. For example, there are many User node objects, each with a unique ID representing a person on Facebook. To read a node, you query a specific object's ID. So, to read your User node you would query its ID:
+```
+curl -i -X GET "https://graph.facebook.com/{your-user-id}?fields=id,name&access_token={your-user-access-token}"
+```
+This request would return the following fields (node properties) by default, formatted using JSON:
+
+```
+{
+  "name": "Your Name",
+  "id": "your-user-id"
+}
+```
+
+#### Edges
+Nodes have edges, which usually can return collections of other nodes which are attached to them. To read an edge, you must include both the node ID and the edge name in the path. For example, /user nodes have a /feed edge which can return all Post nodes on a User. You'll need to get a new access token and select user_posts permissions during the Get access token flow. Here's how you could use the edge to get all your Posts:
+```
+curl -i -X GET "https://graph.facebook.com/{your-user-id}/feed?access_token={your-user-access-token}"
+```
+
+The JSON response would look something like this:
+```
+{
+  "data": [
+    {
+      "created_time": "2017-12-08T01:08:57+0000",
+      "message": "Love this puzzle. One of my favorite puzzles",
+      "id": "post-id"
+    },
+    {
+      "created_time": "2017-12-07T20:06:14+0000",
+      "message": "You need to add grape as a flavor.",
+      "id": "post-id"
+    }
+  ]
+}
+```
+
+### Both
+Declaration field for Nodes and Edges in SDK is "Graph". Default value if You not declaration request type is `0`, So if You request Edges API set Graph to `1`.
+
+Default value of "Graph" is:
+ - 0 for Nodes
+ - 1 for Edges
+
+If you want use Edges API, the SDK config like:
+```
+config := sdk.Facebook{
+	Token:   "<you facebook access token>",
+	AppKey:  "<your app secret>",
+	Version: "v9.0",
+	Graph:   1,
+}
+
+fbSDK, err := sdk.NewFacebook(config)
+if err != nil {
+	// TODO error
+}
+
+resp := fbSDK.Get("<campaign_id>/insights", sdk.WithParamQuery(sdk.ParamQuery{"fields": "reach"}))
+```
+
+### APP Secret Proof
+When you enable the `appsecret_proof` in Your app's settings, `AppKey` is must fill. You can not empty this field.
+
 ### Login Authentication
 Create two API, first use for request to facebook and second for retrive data from facebook.
 ```
@@ -91,4 +163,4 @@ if you want to request some fields, just add param query in request:
 Feel free to create an issue or send me a pull request if you have any "how-to" question or bug or suggestion when using this package. I'll try my best to reply to it.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+This package is licensed under the [MIT license](https://choosealicense.com/licenses/mit/).

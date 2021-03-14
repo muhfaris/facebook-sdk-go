@@ -204,7 +204,7 @@ batch := ArrayOfBatchBodyRequest{
 	},
 	{
 		Method:      "GET",
-		RelativeURL: "act_357050710/campaigns",
+		RelativeURL: "<act_id>/campaigns",
 	},
 }
 

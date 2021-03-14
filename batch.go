@@ -52,7 +52,7 @@ func (batches ArrayOfBatchResponse) HasError() (BatchDataResponse, bool) {
 	return BatchDataResponse{}, false
 }
 
-// HasErrors is check what batch response has error
+// HasErrors is check what batch response has error with return error
 func (batches ArrayOfBatchResponse) HasErrors() (ArrayOfBatchResponse, bool) {
 	var errorResponseBatches ArrayOfBatchResponse
 	for _, batch := range batches {

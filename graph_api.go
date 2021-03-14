@@ -67,6 +67,7 @@ type requestParam struct {
 // RequestOptions is type function for dealing with optional reuest parameter
 type requestOptions func(r *requestParam)
 
+// newRequestOptions is initialize new a request
 func newRequestOptions(opts ...requestOptions) *requestParam {
 	var rp = &requestParam{}
 	for _, opt := range opts {
@@ -200,21 +201,9 @@ func (m *Graph) Batch(bulkRequest ArrayOfBatchBodyRequest) BatchResponse {
 	var data ArrayOfBatchResponse
 	err = json.Unmarshal(response.Body, &data)
 	if err != nil {
-		var resp Response
-		err = json.Unmarshal(response.Body, &resp)
-		if err != nil {
-			return BatchResponse{
-				Error: &ErrorResponse{Message: fmt.Sprintf("fbSDK: error unmarshal response error, %s", err.Error())},
-			}
+		return BatchResponse{
+			Error: &ErrorResponse{Message: fmt.Sprintf("fbSDK: error unmarshal response data, %s", err.Error())},
 		}
-
-		if resp.Error.FbtraceID != "" {
-			return BatchResponse{
-				Error: resp.Error,
-			}
-		}
-
-		return BatchResponse{Error: &ErrorResponse{Message: fmt.Sprintf("fbSDK: error unmarshal response data, %s", err.Error())}}
 	}
 
 	return BatchResponse{

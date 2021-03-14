@@ -1,4 +1,3 @@
-
 ## Facebook SDK Go
 The Facebook SDK Go is a library with powerful feature that enable Go developer to easily integrate Facebook login and make requests to the Graph API.
 
@@ -128,8 +127,9 @@ func main() {
 }
 ```
 
-### List Ad Account
-Create handler like below:
+### GET Operation
+This example request list ad account from `/me/adaccounts`.
+
 ```
 func adaccount(c echo.Context) error {
 	config := sdk.Facebook{
@@ -154,9 +154,66 @@ func adaccount(c echo.Context) error {
 
 if you want to request some fields, just add param query in request:
 ```
-	resp := fbSDK.Get("/me/adaccounts", WithParamQuery(ParamQuery{
-		"fields": "name,account_status",
-	}))
+resp := fbSDK.Get("/me/adaccounts", WithParamQuery(ParamQuery{
+	"fields": "name,account_status",
+}))
+```
+
+### Post Operation
+Post operation can use `WithBody()` for pass of data.
+
+```
+data := map[string]interface{}{
+	"name":                  "test-1",
+	"special_ad_categories": []string{"NONE"},
+	"objective":             "CONVERSIONS",
+	"status":                "PAUSED",
+}
+
+resp := got.Post("<act_id>/campaigns", WithBody(data))
+if resp .Error != nil {
+    // TODO error
+	return
+}
+
+campaign := struct {
+	ID string `json:"id,omitempty"`
+}{}
+
+_ = resp.Unmarshal(&campaign)
+fmt.Println("Campaign ID:",  campaign.ID)
+```
+
+### Delete Operation
+```
+resp := got.Delete(dc.ID)
+campaignResponse := struct {
+	Success bool `json:"success,omitempty"`
+}{}
+
+_ = resp.Unmarshal(&campaignResponse)
+fmt.Println("Response:", campaignResponse.Success)
+```
+
+### Batch Request
+```
+batch := ArrayOfBatchBodyRequest{
+	{
+		Method:      "GET",
+		RelativeURL: "/me/adaccountssx",
+	},
+	{
+		Method:      "GET",
+		RelativeURL: "act_357050710/campaigns",
+	},
+}
+
+resp := got.Batch(batch)
+
+if _, ok := resp.Data.HasErrors(); ok {
+	// Todo Error
+	return
+}
 ```
 
 ## Contributing

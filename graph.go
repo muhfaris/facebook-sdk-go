@@ -28,6 +28,15 @@ func NewGraph(options ...GraphOptions) *Graph {
 	return graph
 }
 
+// ChangeGraph is change graph type, available type is node or edge
+func (g *Graph) ChangeGraph(graph int) {
+	if graph < 0 || graph > 1 {
+		return
+	}
+
+	g.graphType = graph
+}
+
 // ChangeToken is change token
 func (g *Graph) ChangeToken(token string) error {
 	if token == "" {
@@ -35,7 +44,13 @@ func (g *Graph) ChangeToken(token string) error {
 	}
 
 	g.token = fmt.Sprintf("%s %s", bearerKey, token)
+	g.changeSecretProof(token)
 	return nil
+}
+
+// changeSecretProof is change secret proof
+func (g *Graph) changeSecretProof(token string) {
+	g.secretProof = HashHmac(g.appKey, []byte(token))
 }
 
 // GraphOptions is options

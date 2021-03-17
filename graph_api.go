@@ -37,6 +37,18 @@ func (m *Graph) generateURL(path string, paramQuery ParamQuery) string {
 // it have 2 type API, node and edge, based my experienced response of node api without data field json,
 // but in edge api facebook response the data inside data field json
 func (m *Graph) response(response request.ReqResponse) Response {
+	// for error resposne
+	var resp = Response{
+		HTTPResponse: response.HTTP,
+	}
+
+	err := json.Unmarshal(response.Body, &resp)
+	if err != nil {
+		resp.Error = &ErrorResponse{Message: fmt.Sprintf("fbSDK: error unmarshal response facebook, %v", err)}
+		return resp
+	}
+	// end error
+
 	switch m.graphType {
 	case edgeGraph:
 		var resp = Response{

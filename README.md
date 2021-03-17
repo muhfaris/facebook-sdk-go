@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/muhfaris/facebook-sdk-go)](https://goreportcard.com/report/github.com/muhfaris/facebook-sdk-go)
+
 ## Facebook SDK Go
 The Facebook SDK Go is a library with powerful feature that enable Go developer to easily integrate Facebook login and make requests to the Graph API.
 

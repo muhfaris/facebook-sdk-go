@@ -10,9 +10,10 @@ const endpoint = "https://graph.facebook.com"
 
 // FacebookAPI interface
 type FacebookAPI interface {
-	Authenticate(state string, scopes ...string) *Authenticate
 	ChangeToken(string) error
+	ChangeGraph(int)
 
+	Authenticate(state string, scopes ...string) *Authenticate
 	Get(string, ...requestOptions) Response
 	Post(string, ...requestOptions) Response
 	Delete(string, ...requestOptions) Response

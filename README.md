@@ -65,7 +65,7 @@ Facebook SDK declaration Nodes and Edges with value 0 and 1:
  - 0 for Nodes
  - 1 for Edges
 
- Default value of SDK is Nodes (1), If you want to request Edges change `Graph` to 1. the SDK config like below:
+ Default value of SDK is Nodes (0), If you want to request Edges change `Graph` to 1. the SDK config like below:
 
 ```
 package main

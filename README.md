@@ -60,28 +60,54 @@ The JSON response would look something like this:
 }
 ```
 
-### Both
-Declaration field for Nodes and Edges in SDK is "Graph". Default value if You not declaration request type is `0`, So if You request Edges API set Graph to `1`.
-
-Default value of "Graph" is:
+### Both (Nodes and Edge)
+Facebook SDK declaration Nodes and Edges with value 0 and 1:
  - 0 for Nodes
  - 1 for Edges
 
-If you want use Edges API, the SDK config like:
+ Default value of SDK is Nodes (1), If you want to request Edges change `Graph` to 1. the SDK config like below:
+
 ```
-config := sdk.Facebook{
-	Token:   "<you facebook access token>",
-	AppKey:  "<your app secret>",
-	Version: "v9.0",
-	Graph:   1,
+package main
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+)
+
+func insights(c echo.Context) error {
+	config := sdk.Facebook{
+		Token:   "",
+		AppKey:  "",
+		Version: "v9.0",
+		Graph: 1,
+	}
+
+	fbSDK, err := sdk.NewFacebook(config)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	resp := fbSDK.Get("<campaign_id>/insights", sdk.WithParamQuery(sdk.ParamQuery{"fields": "reach"}))
+	if resp.Error != nil {
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
-fbSDK, err := sdk.NewFacebook(config)
-if err != nil {
-	// TODO error
+func main(){
+ 	e := echo.New()
+
+	// Routes
+	e.GET("/insights", insights)
+	e.Logger.Fatal(e.Start(":8989"))
 }
 
-resp := fbSDK.Get("<campaign_id>/insights", sdk.WithParamQuery(sdk.ParamQuery{"fields": "reach"}))
+
 ```
 
 ### APP Secret Proof
@@ -90,19 +116,32 @@ When you enable the `appsecret_proof` in Your app's settings, `AppKey` is must f
 ### Login Authentication
 Create two API, first use for request to facebook and second for retrive data from facebook.
 ```
+package main
+
+import (
+	"net/http"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+
+	"github.com/labstack/echo/v4"
+)
+
 var fbSDK sdk.FacebookAPI
+
 // Handler
 func login(c echo.Context) error {
 	config := sdk.Facebook{
 		AppID:       "",
 		AppKey:      "",
 		Version:     "v9",
-		RedirectURL: "https://localhost:8989/callback", // reference to callback function
+		RedirectURL: "https://localhost:8989/callback",
 	}
 
 	fbSDK, _ = sdk.NewFacebook(config)
+
 	authenticate := fbSDK.Authenticate("example-state")
 	url := authenticate.URL()
+
 	c.Redirect(http.StatusFound, url)
 	return nil
 }
@@ -113,6 +152,7 @@ func callback(c echo.Context) error {
 
 	code := c.FormValue("code")
 	token, _ := authenticate.GetAccessToken(code)
+
 	return c.JSON(http.StatusOK, token)
 }
 
@@ -128,15 +168,26 @@ func main() {
 	e.Logger.Fatal(e.StartTLS(":8989", "localhost+2.pem", "localhost+2-key.pem"))
 }
 ```
+*Note: Please, generate tls certificate your self*.
 
 ### GET Operation
 This example request list ad account from `/me/adaccounts`.
 
 ```
+package main
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+)
+
 func adaccount(c echo.Context) error {
 	config := sdk.Facebook{
-		Token:   "<your_facebook_access_token>",
-		AppKey:  "<your_faebook_app_key/secret_app>",
+		Token:   "",
+		AppKey:  "",
 		Version: "v9.0",
 	}
 
@@ -152,9 +203,20 @@ func adaccount(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+func main() {
+	e := echo.New()
+
+	// Routes
+	e.GET("/adaccounts", adaccount)
+
+	// Start server
+	// generate ssl certificate use mkcert (https://github.com/FiloSottile/mkcert)
+	e.Logger.Fatal(e.Start(":8989"))
+}
 ```
 
-if you want to request some fields, just add param query in request:
+if you want to request with some fields, just add param query in request:
 ```
 resp := fbSDK.Get("/me/adaccounts", WithParamQuery(ParamQuery{
 	"fields": "name,account_status",
@@ -165,57 +227,159 @@ resp := fbSDK.Get("/me/adaccounts", WithParamQuery(ParamQuery{
 Post operation can use `WithBody()` for pass of data.
 
 ```
-data := map[string]interface{}{
-	"name":                  "test-1",
-	"special_ad_categories": []string{"NONE"},
-	"objective":             "CONVERSIONS",
-	"status":                "PAUSED",
+package main
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+)
+
+func campaign(c echo.Context) error {
+	config := sdk.Facebook{
+		Token:   "",
+		AppKey:  "",
+		Version: "v9.0",
+	}
+
+	fbSDK, err := sdk.NewFacebook(config)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	data := map[string]interface{}{
+    	"name":                  "test-1",
+    	"special_ad_categories": []string{"NONE"},
+    	"objective":             "CONVERSIONS",
+    	"status":                "PAUSED",
+    	}
+
+	resp := fbSDK.Post("<act_id>/campaigns", WithBody(data))
+	if resp.Error != nil {
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
-resp := got.Post("<act_id>/campaigns", WithBody(data))
-if resp .Error != nil {
-    // TODO error
-	return
+func main() {
+	e := echo.New()
+
+	// Routes
+	e.GET("/campaigns", campaign)
+
+	// Start server
+	// generate ssl certificate use mkcert (https://github.com/FiloSottile/mkcert)
+	e.Logger.Fatal(e.Start(":8989"))
 }
 
-campaign := struct {
-	ID string `json:"id,omitempty"`
-}{}
-
-_ = resp.Unmarshal(&campaign)
-fmt.Println("Campaign ID:",  campaign.ID)
 ```
 
 ### Delete Operation
 ```
-resp := got.Delete(dc.ID)
-campaignResponse := struct {
-	Success bool `json:"success,omitempty"`
-}{}
+package main
 
-_ = resp.Unmarshal(&campaignResponse)
-fmt.Println("Response:", campaignResponse.Success)
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+)
+
+func campaigns(c echo.Context) error {
+	config := sdk.Facebook{
+		Token:   "",
+		AppKey:  "",
+		Version: "v9.0",
+	}
+
+	fbSDK, err := sdk.NewFacebook(config)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	resp := fbSDK.Delete(<object_id>)
+	if resp.Error != nil {
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+func main() {
+	e := echo.New()
+
+	// Routes
+	e.DELETE("/campaigns", campaigns)
+
+	// Start server
+	// generate ssl certificate use mkcert (https://github.com/FiloSottile/mkcert)
+	e.Logger.Fatal(e.Start(":8989"))
+}
+
 ```
 
 ### Batch Request
 ```
-batch := ArrayOfBatchBodyRequest{
-	{
-		Method:      "GET",
-		RelativeURL: "/me/adaccountssx",
-	},
-	{
-		Method:      "GET",
-		RelativeURL: "<act_id>/campaigns",
-	},
+package main
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
+	sdk "github.com/muhfaris/facebook-sdk-go"
+)
+
+func batch(c echo.Context) error {
+	config := sdk.Facebook{
+		Token:   "",
+		AppKey:  "",
+		Version: "v9.0",
+	}
+
+	fbSDK, err := sdk.NewFacebook(config)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	batch := ArrayOfBatchBodyRequest{
+    	{
+    		Method:      "GET",
+    		RelativeURL: "/me/adaccountssx",
+    	},
+    	{
+    		Method:      "GET",
+    		RelativeURL: "<act_id>/campaigns",
+    	},
+    }
+
+	resp := fbSDK.Batch(batch)
+	if resp.Error != nil {
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+
+	if _, ok := resp.Data.HasErrors(); ok {
+	    // Todo Error
+    }
+
+	return c.JSON(http.StatusOK, resp)
 }
 
-resp := got.Batch(batch)
+func main() {
+	e := echo.New()
 
-if _, ok := resp.Data.HasErrors(); ok {
-	// Todo Error
-	return
+	// Routes
+	e.DELETE("/batch", batch)
+
+	// Start server
+	// generate ssl certificate use mkcert (https://github.com/FiloSottile/mkcert)
+	e.Logger.Fatal(e.Start(":8989"))
 }
+
 ```
 
 ## Contributing

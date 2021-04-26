@@ -3,6 +3,7 @@ package sdk
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/muhfaris/request"
 )
@@ -37,6 +38,13 @@ func (m *Graph) generateURL(path string, paramQuery ParamQuery) string {
 // it have 2 type API, node and edge, based my experienced response of node api without data field json,
 // but in edge api facebook response the data inside data field json
 func (m *Graph) response(response request.ReqResponse) Response {
+	if response.HTTP.StatusCode == http.StatusNotModified {
+		return Response{
+			HTTPResponse: response.HTTP,
+			Data:         response.Body,
+		}
+	}
+
 	// for error resposne
 	var resp = Response{
 		HTTPResponse: response.HTTP,
@@ -50,7 +58,7 @@ func (m *Graph) response(response request.ReqResponse) Response {
 	// end error
 
 	switch m.graphType {
-	case edgeGraph:
+	case EdgeGraph:
 		var resp = Response{
 			HTTPResponse: response.HTTP,
 		}
@@ -74,6 +82,7 @@ func (m *Graph) response(response request.ReqResponse) Response {
 type requestParam struct {
 	paramQuery ParamQuery
 	body       interface{}
+	headers    map[string]string
 }
 
 // RequestOptions is type function for dealing with optional reuest parameter
@@ -103,6 +112,13 @@ func WithParamQuery(paramQuery ParamQuery) requestOptions {
 	}
 }
 
+// WithHeaders is custom header request
+func WithHeaders(headers map[string]string) requestOptions {
+	return func(r *requestParam) {
+		r.headers = headers
+	}
+}
+
 // Get method get request to facebook
 func (m *Graph) Get(path string, opts ...requestOptions) Response {
 	var requestParam = newRequestOptions(opts...)
@@ -112,6 +128,7 @@ func (m *Graph) Get(path string, opts ...requestOptions) Response {
 		URL:           url,
 		ContentType:   JSONContentType,
 		Authorization: m.token,
+		Headers:       requestParam.headers,
 	}
 
 	response, err := req.GET()
@@ -143,6 +160,7 @@ func (m *Graph) Post(path string, opts ...requestOptions) Response {
 		ContentType:   JSONContentType,
 		Authorization: m.token,
 		Body:          body,
+		Headers:       requestParam.headers,
 	}
 
 	response, err := req.POST()
@@ -174,6 +192,7 @@ func (m *Graph) Delete(path string, opts ...requestOptions) Response {
 		ContentType:   JSONContentType,
 		Authorization: m.token,
 		Body:          body,
+		Headers:       requestParam.headers,
 	}
 
 	response, err := req.DELETE()

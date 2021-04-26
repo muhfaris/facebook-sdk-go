@@ -26,8 +26,8 @@ type Response struct {
 }
 
 const (
-	nodeGraph = iota
-	edgeGraph
+	NodeGraph = iota
+	EdgeGraph
 )
 
 // Unmarshal is unmarshal data to obejct

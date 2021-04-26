@@ -6,17 +6,15 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
-builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
+build:
+  skip: true
 checksum:
   name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
+release:
+  github:
+  prerelease: auto
 changelog:
   sort: asc
   filters:

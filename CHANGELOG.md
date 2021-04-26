@@ -7,6 +7,8 @@
 - add go report card
 
 ### Feat
+- changelog
+- custom headers  request
 - options to change graph type and secret proof
 
 ### Fix
